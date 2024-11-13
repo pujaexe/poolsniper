@@ -3,7 +3,10 @@ const { Metaplex } = require("@metaplex-foundation/js");
 
 const RAYDIUM_PUBLIC_KEY = "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8";
 const BOT_TOKEN = "7177577713:AAETbhstiJK8bfTKzjl5mhCiIpiP1sGq2VU";
-const CHANNELS = ["-1002149791590_797", "-1002149791590_799"];
+const CHANNELS = [
+  "-1002149791590_797", 
+  "-1002149791590_799",
+];
 
 const raydium = new PublicKey(RAYDIUM_PUBLIC_KEY);
 let connection = new Connection("https://api.mainnet-beta.solana.com", {
