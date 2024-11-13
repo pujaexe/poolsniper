@@ -213,7 +213,7 @@ async function postToTelegramChannel(channelId, message) {
 function generateMessage(ca, pa, dexpStatus, name, symbol) {
   const dexpStatusText = dexpStatus ? "✅ Dexpaid" : undefined;
   return `
-$${symbol} | ${name}*
+*$${symbol} | ${name}*
 ⚡️ CA: \`${ca}\`
 ${dexpStatusText ? dexpStatusText : ""}
 [DEX](https://dexscreener.com/solana/${pa}) | [Bonk Bot](https://t.me/furiosa_bonkbot?start=ref_tcisj_ca_${ca}) | [Trojan Bot](https://t.me/solana_trojanbot?start=r-pujaexe-${ca})
