@@ -7,6 +7,7 @@ const CHANNELS = [
   "-1002149791590_797", 
   "-1002149791590_799",
 ];
+const zoolanaChannelChatId = "-1002260716985";
 
 const raydium = new PublicKey(RAYDIUM_PUBLIC_KEY);
 let connection = new Connection("https://api.mainnet-beta.solana.com", {
@@ -74,13 +75,25 @@ async function fetchRaydiumAccounts(txId, connection, retryCount = 0) {
       tokenSymbol,
     );
 
-    postToTelegramChannel(CHANNELS[tokenType], message)
+    const messageThreadId = CHANNELS[tokenType].split("_")[1];
+    postToTelegramChannel(CHANNELS[tokenType], message, messageThreadId)
       .then((_) => {
-        console.log("POST TO TELEGRAM");
+        console.log("Posted to Zoolana.Club");
       })
       .catch((err) => {
         console.error(err);
       });
+
+    // For paid only tokens, send notif to Zoolana.Club Channel
+    if (tokenType === 1) {
+      postToTelegramChannel(zoolanaChannelChatId, message)
+        .then((_) => {
+          console.log("Posted to Zoolana.Club Channel");
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    }
   } catch (error) {
     if (error.message.includes("429 Too Many Requests")) {
       // Eksponensial backoff
@@ -181,16 +194,21 @@ async function fetchTokenMetadata(address) {
   }
 }
 
-async function postToTelegramChannel(channelId, message) {
+async function postToTelegramChannel(channelId, message, threadId) {
   const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-  const messageThreadId = channelId.split("_")[1];
 
-  const payload = {
+  let payload = {
     chat_id: channelId,
-    message_thread_id: messageThreadId,
     text: message,
     parse_mode: "Markdown",
   };
+
+  if (threadId) {
+    payload = {
+      ...payload,
+      message_thread_id: threadId,
+    }
+  }
 
   try {
     const response = await fetch(url, {
