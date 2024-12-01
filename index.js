@@ -76,23 +76,31 @@ async function fetchRaydiumAccounts(txId, connection, retryCount = 0) {
     );
 
     const messageThreadId = CHANNELS[tokenType].split("_")[1];
-    postToTelegramChannel(CHANNELS[tokenType], message, messageThreadId)
-      .then((_) => {
+    postToTelegramChannel(CHANNELS[tokenType], message, messageThreadId).then((_) => {
         console.log("Posted to Zoolana.Club");
-      })
-      .catch((err) => {
+    }).catch((err) => {
         console.error(err);
-      });
+    });
+
+    sendBuyToken("pump-all",contractAddress).then((_) => {
+      console.log("send to buy pump all");
+    }).catch((err) => {
+      console.error(err);
+    });
 
     // For paid only tokens, send notif to Zoolana.Club Channel
     if (tokenType === 1) {
-      postToTelegramChannel(zoolanaChannelChatId, message)
-        .then((_) => {
+      postToTelegramChannel(zoolanaChannelChatId, message).then((_) => {
           console.log("Posted to Zoolana.Club Channel");
-        })
-        .catch((err) => {
+      }).catch((err) => {
           console.error(err);
-        });
+      });
+
+      sendBuyToken("pump-dex",contractAddress).then((_) => {
+          console.log("send to buy pump-dex");
+      }).catch((err) => {
+          console.error(err);
+      });
     }
   } catch (error) {
     if (error.message.includes("429 Too Many Requests")) {
@@ -238,4 +246,34 @@ ${dexpStatusText ? dexpStatusText : ""}
     `;
 }
 
+
+async function sendBuyToken(type,ca) {
+  const url = `https://trojan-auto-buy.fly.dev/${type}`;
+
+  const body = {
+    contractAddress: ca
+  };
+
+  const headers = {
+    "Content-Type": "application/json",
+    "x-api-key": "01937e23-9d5d-7218-b039-d5ecc667fca8"
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(body),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Response:", data);
+    } else {
+      console.error("Failed to send request:", response.statusText);
+    }
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
 main(connection, raydium).catch(console.error);
